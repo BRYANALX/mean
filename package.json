@@ -7,10 +7,24 @@
     "build": "ng build",
     "test": "ng test",
     "test:server": "node spec/spec.js",
+    "test:server:coverage": "nyc node spec/spec.js",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
   "private": true,
+  "nyc": {
+    "report-dir": "./spec/instanbul/report",
+    "temp-dir": "./spec/instanbul",
+    "reporter": [
+      "text",
+      "text-summary",
+      "html"
+    ],
+    "exclude": [
+      "spec/**/*",
+      "server/*.spec.js"
+    ]
+  },
   "dependencies": {
     "@angular/animations": "^8.2.14",
     "@angular/cdk": "^7.3.7",
@@ -56,6 +70,7 @@
     "karma-coverage-istanbul-reporter": "^2.0.6",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "nyc": "^15.1.0",
     "protractor": "^5.4.4",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
