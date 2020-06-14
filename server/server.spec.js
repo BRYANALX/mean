@@ -1,13 +1,21 @@
+// Creando nuestro Propio servidor con lo mínimo necesario para hacer PRUEBAS.
+// IMPORTANTE: debe ser lo más parecido al servidor donde esta nuestro código que va a ser testeado.
+
 const express = require('express');
 const morgan = require('morgan');
 const { createServer } = require('http');
+const request = require('request'); // depreciado - alternativas https://github.com/request/request/issues/3143
+const requestPromise = require('request-promise-native');
+const axios = require('axios').default;
+
 const Pins = require('./models/Pins');
 const apiRouter = require('./routes/pins').router;
-const request = require('request'); // depreciado - alternativas https://github.com/request/request/issues/3143
+
 
 const app = express();
 
 app.use(morgan('dev'));
+app.use(express.json());
 app.use('/api', apiRouter);
 
 
@@ -100,7 +108,40 @@ describe('Testing Router', () => {
 
     describe('Testing POST', () => {
 
+        it('llamar a recurso /api/ esperando 200', done => {
+
+            spyOn(Pins, 'create').and.callFake((pinFake, callback) => {
+                callback(false, {})
+            });
+
+            spyOn(requestPromise, 'get').and.returnValue(
+                Promise.resolve('<title>Platzi</title><meta name="description" content="Platzi reglas">')
+            );
+
+            const requestPost = {
+                title: 'Titulo',
+                author: 'Autor',
+                description: 'Esta es una descripción',
+                assets: [{ url: 'http://platzi.com' }]
+            };
+
+            // llamada POST con request
+            request.post('http://localhost:3000/api/', { json: requestPost }, (error, response, body) => {
+                expect(response.statusCode).toBe(200);
+                done();
+            });
+
+            // llamada POST con axios
+            // axios.post('http://localhost:3000/api/', requestPost).then(data => {
+            //     expect(data.status).toBe(200);
+            //     done();
+            // })
+
+        });
+
     });
+
+
 
 
 
