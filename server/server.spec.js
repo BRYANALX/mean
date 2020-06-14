@@ -32,7 +32,9 @@ describe('Testing Router', () => {
 
             // SIMULAR LLAMADA A MÉTODO 'find' DE MONGOOSE
 
-            // 'and' accede a la estrategia por defecto y devuelve un SpyStrategy
+            // spyOn        intercepta con un espia a la funcion, simulado es esa función
+            // and          accede a la estrategia por defecto y devuelve un SpyStrategy
+            // callFake     devuelve una function con la misma definicion del método para poder manipularla
             spyOn(Pins, 'find').and.callFake(callbackFromFind => {
 
                 // => callbackFromFind
@@ -52,36 +54,51 @@ describe('Testing Router', () => {
 
                 done(); // detener asincronismo
             })
-
-
         });
-        
 
-        it('Llama a recurso /api al método raíz esperando 500', done => {
+
+        it('Llama a recurso /api/ esperando 500', done => {
 
             // SIMULAR LLAMADA A MÉTODO 'find' DE MONGOOSE
 
-            // 'and' accede a la estrategia por defecto y devuelve un SpyStrategy
-            spyOn(Pins, 'find').and.callFake(callbackFromFind => {
-
-                // => callbackFromFind
-                // function(err, pins) {
-                //     if (err) return next(err);
-                //     res.json(pins);
-                // }
-
-                callbackFromFind(true, null);
+            // spyOn        intercepta con un espia a la funcion, simulado es esa función
+            // and          accede a la estrategia por defecto y devuelve un SpyStrategy
+            // callFake     devuelve una function con la misma definicion del método para poder manipularla
+            spyOn(Pins, 'find').and.callFake(callback => {
+                callback(true, null);
             });
 
-
-            request.get('http://localhost:3000/api/', (error, response, bodyI) => {
+            request.get('http://localhost:3000/api/', (error, response, body) => {
                 expect(response.statusCode).toBe(500);
+
                 done(); // detener asincronismo
             })
-
-
         });
 
+
+        it('llamar a recurso /api/:id esperando 200', done => {
+            // SIMULAR LLAMADA A MÉTODO 'findById' DE MONGOOSE
+
+            // spyOn        intercepta con un espia a la funcion, simulado es esa función
+            // and          accede a la estrategia por defecto y devuelve un SpyStrategy
+            // callFake     devuelve una function con la misma definicion del método para poder manipularla
+            spyOn(Pins, 'findById').and.callFake((id, callback) => {
+                const pinsFake = [{ id: 1 }];
+                callback(false, pinsFake);
+            })
+
+            request.get('http://localhost:3000/api/1001', (error, response, body) => {
+                expect(response.statusCode).toBe(200);
+                done();
+            })
+
+        })
+
+
+    });
+
+
+    describe('Testing POST', () => {
 
     });
 
